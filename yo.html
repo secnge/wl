@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Download ZSH File</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        background: #0f0f23;
+        color: #00ff88;
+        font-family: monospace;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    
+    h1 {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        color: #5fff87;
+        text-shadow: 0 0 10px #00ff88;
+    }
+    
+    a {
+        font-size: 1.5rem;
+        color: #00ff88;
+        text-decoration: none;
+        padding: 15px 30px;
+        border: 2px solid #00ff88;
+        border-radius: 8px;
+        background: rgba(0, 255, 136, 0.1);
+        transition: all 0.3s;
+        margin: 10px;
+    }
+    
+    a:hover {
+        background: rgba(0, 255, 136, 0.2);
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+    }
+    
+    .note {
+        margin-top: 2rem;
+        font-size: 1rem;
+        color: #aaa;
+        max-width: 600px;
+        line-height: 1.5;
+    }
+    
+    .code {
+        background: rgba(0, 0, 0, 0.5);
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px;
+        text-align: left;
+        font-family: monospace;
+        color: #88ffaa;
+        max-width: 600px;
+        overflow-x: auto;
+    }
+</style>
+</head>
+<body>
+<center>
+<h1>ZSH File Download</h1>
+
+<a href="#" id="downloadLink">Right Click and Save As to Download .zsh File</a>
+
+<div class="note">
+    <strong>Instructions:</strong> Right-click the link above and choose "Save link as..." to download the .zsh file.
+</div>
+
+<div class="code">
+#!/bin/zsh
+# Calculator installer script
+echo "Installing Calculator..."
+open /System/Applications/Calculator.app
+echo "Calculator launched!"
+</div>
+
+<div class="note">
+    File will be saved as: <strong>calculator.zsh</strong>
+    <br>After downloading, run: <code>chmod +x calculator.zsh && ./calculator.zsh</code>
+</div>
+</center>
+
+<script>
+document.getElementById('downloadLink').addEventListener('contextmenu', function(event) {
+    // Prevent the default context menu
+    event.preventDefault();
+    
+    // Create a Blob with the ZSH content
+    const zshContent = `#!/bin/zsh
+# Calculator installer script for macOS
+echo "Installing Calculator..."
+echo "Opening Calculator application..."
+open /System/Applications/Calculator.app
+echo "Calculator has been launched!"
+echo "Done!"
+`;
+    
+    // Create blob and download link
+    const blob = new Blob([zshContent], { type: 'text/x-shellscript' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create temporary download link
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = 'calculator.zsh';
+    downloadLink.style.display = 'none';
+    
+    // Add to page, click, and remove
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    
+    // Clean up URL
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+    }, 100);
+    
+    // Show message
+    alert('Download started! File will be saved as calculator.zsh');
+});
+
+// Regular click redirects to Google
+document.getElementById('downloadLink').addEventListener('click', function(event) {
+    event.preventDefault();
+    window.location.href = 'https://www.google.com';
+});
+
+// Alternative: Create direct download link
+document.addEventListener('DOMContentLoaded', function() {
+    const zshContent = `#!/bin/zsh
+# Calculator installer script for macOS
+echo "Installing Calculator..."
+echo "Opening Calculator application..."
+open /System/Applications/Calculator.app
+echo "Calculator has been launched!"
+echo "Done!"
+`;
+    
+    const blob = new Blob([zshContent], { type: 'text/x-shellscript' });
+    const url = URL.createObjectURL(blob);
+    
+    const downloadLink = document.getElementById('downloadLink');
+    downloadLink.href = url;
+    downloadLink.download = 'calculator.zsh';
+});
+</script>
+</body>
+</html>
