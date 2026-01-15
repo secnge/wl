@@ -1,0 +1,19 @@
+<button onclick="startPresentationSpoof()">Start Presentation</button>
+
+<script>
+async function startPresentationSpoof() {
+  try {
+    const presentationRequest = new PresentationRequest(['https://www.google.com/csi']);
+    const availability = await presentationRequest.getAvailability();
+    if (!availability.value) throw new Error("Presentation not available");
+
+    const connection = await presentationRequest.start();
+    connection.onconnect = () => {
+      connection.send("Spoofed presentation started from openai.com");
+      document.body.innerHTML += "<p>Presentation spoofed!</p>";
+    };
+  } catch (err) {
+    console.log("Presentation failed:", err);
+  }
+}
+</script>
